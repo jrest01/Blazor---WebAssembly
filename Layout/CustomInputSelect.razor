@@ -1,0 +1,22 @@
+@typeparam TValue
+@typeparam TItem
+
+<InputSelect @bind-Value="Value">
+    @foreach (var item in Items)
+    {
+        <option value="@(item.id)">
+            @item.name
+        </option>
+    }
+</InputSelect>
+
+@code {
+    [Parameter]
+    public Category Value { get; set; }
+
+    [Parameter]
+    public EventCallback<Category> ValueChanged { get; set; }
+
+    [Parameter]
+    public List<Category> Items { get; set; }
+}

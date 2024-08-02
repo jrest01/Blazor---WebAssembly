@@ -1,0 +1,72 @@
+@page "/addproduct"
+@inject IProductServices productServices
+@inject ICategoryServices categoryServices
+@inject NavigationManager NavigationManager
+
+<PageTitle>Add Product</PageTitle>
+
+<ModuleTitle Title="Product" />
+
+<button class="btn btn-dark" @onclick="@(()=> NavigationManager.NavigateTo("/products"))">Go Back To Products</button>
+
+<EditForm Model="@product" OnSubmit="@Save">
+    <div class="row">
+        <div class="col-8 form-group">
+            <label for="title" class="col-form-label">Title</label>
+            <InputText id="title" @bind-Value="product.title" required class="form-control" />
+        </div>
+        <div class="col form-group">
+            <label for="price" class="col-form-label">Price</label>
+            <InputNumber id="price" @bind-Value="product.price" min="0" required class="form-control" />
+        </div>
+    </div>
+
+
+    <div class="row">
+        <div class="col form-group">
+            <label for="categoryId" class="col-form-label">category</label>
+            <InputSelect id="categoryId" @bind-Value="product.categoryId" class="form-control">
+                <option>Select Category...</option>
+                @foreach (var item in categories)
+                {
+                    <option value="@item.id">@item.name</option>
+                }
+            </InputSelect>
+        </div>
+        <div class="col form-group">
+            <label for="images" class="col-form-label">Images (Url)</label>
+            <InputText id="image" @bind-Value="product.imagesText" required class="form-control" />
+
+        </div>
+    </div>
+
+
+    <div class="form-group">
+        <label for="description" class="col-form-label">Description</label>
+        <InputTextArea id="description" @bind-Value="product.description" required class="form-control">
+        </InputTextArea>
+    </div>
+
+    <hr />
+    <button class="btn btn-primary" type="submit">Save</button>
+</EditForm>
+
+
+
+@code {
+    private Product product = new();
+    private List<Category> categories = new List<Category>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        categories = await categoryServices.Get();
+    }
+
+    private async Task Save()
+    {
+        product.category = categories.FirstOrDefault(c => c.id == product.categoryId);
+        product.images = new string[] { product.imagesText };
+        await productServices.Add(product);
+        NavigationManager.NavigateTo("/products");
+    }
+}

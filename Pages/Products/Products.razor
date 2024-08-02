@@ -1,0 +1,63 @@
+@page "/products"
+@inject ILogger<Products> logger;
+@inject IProductServices producService;
+@inject NavigationManager NavigationManager
+
+<PageTitle>Products</PageTitle>
+
+<ModuleTitle Title="Products" />
+@if (Visible == true)
+{
+    @if (products?.Count > 0)
+    {
+        <button class="btn btn-dark" @onclick="@(()=> NavigationManager.NavigateTo("/addproduct"))">Add Product</button>
+
+        <div class="container mt-5">
+            <div class="row">
+                @foreach (var product in products)
+                {
+                    <div class="col-md-4 mb-4">
+                        <div class="card">
+                            <div class="card">
+                                <img src="@product.images[0]" class="card-img-top" alt="@product.title">
+                                <div class="card-body">
+                                    <h5 class="card-title">@product.title</h5>
+                                    <p class="card-text">@product.description</p>
+                                    <p class="card-text"><strong>Precio:</strong> @product.price.ToString("C")</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+
+                }
+            </div>
+        </div>
+
+
+    }
+}
+else
+{
+    <p>No hay productos para mostrar</p>
+}
+
+@code {
+    private List<Product>? products;
+    private bool Visible { get; set; }
+
+
+    private async Task<List<Product>> GetProducts()
+    {
+        return await producService.Get();
+    }
+
+
+    protected override async void OnInitialized()
+    {
+        Visible = true;
+        products = await GetProducts();
+        Visible = true;
+        StateHasChanged();
+    }
+}
