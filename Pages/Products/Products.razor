@@ -3,6 +3,7 @@
 @inject IProductServices productsService;
 @inject NavigationManager NavigationManager
 @inject IJSRuntime JsRuntime
+@inject IToastService toastService
 
 <PageTitle>Products</PageTitle>
 
@@ -75,14 +76,17 @@ else
 
     private async Task<List<Product>> GetProducts()
     {
+        toastService.ShowError("ProductS");
+
         return await productsService.Get();
     }
 
     private async Task DeleteProduct(Product product)
     {
-        if (!await JsRuntime.InvokeAsync<bool>("confirm", $"Are you sure to remove {product.title}="))
+        if (!await JsRuntime.InvokeAsync<bool>("confirm", $"Are you sure to remove {product.title}"))
             return;
         await productsService.Delete(product.id);
+        toastService.ShowError("Product Deleted");
         products = await GetProducts();
         InvokeAsync(StateHasChanged);
     }
